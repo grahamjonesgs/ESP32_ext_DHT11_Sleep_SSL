@@ -45,7 +45,7 @@ struct tm timeinfo;
 char timeStringBuff[50];
 
 #define LED_PIN  5                         //Select for board type
-#define LED_PIN  LED_BUILTIN
+//#define LED_PIN  LED_BUILTIN
 
 
 // Create objects
@@ -60,6 +60,7 @@ void setup() {
   bootCount++;
   //Set up built in LED as message light
   pinMode(LED_PIN, OUTPUT);
+    
   setup_wifi();                           //Connect to Wifi network
 
 
@@ -83,6 +84,11 @@ void setup() {
   float h = dht.readHumidity();
   if ( isnan(t) || isnan(h)) {
     debug_message(String(timeStringBuff) + " DHT Error", true);
+    flash_led(false);  //three flash error cycles for DHT error
+    delay(500);
+    flash_led(false);
+    delay(500);
+    flash_led(false);
     deep_sleep(TIME_TO_SLEEP_DHT_ERROR);
   }
 
@@ -162,9 +168,9 @@ void debug_message(String message, bool perm) {
 
 
 void flash_led(bool isok) {
-  //3 slow blinks for OK, 3 fast for error
+  //3 slow blinks for OK, 10 fast for error
   if (!isok) {
-    for (int i = 0; i < 3; i++) {        //Error case
+    for (int i = 0; i < 10; i++) {        //Error case
       digitalWrite(LED_PIN, HIGH);
       delay(50);
       digitalWrite(LED_PIN, LOW);
