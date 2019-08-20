@@ -34,6 +34,9 @@ RTC_DATA_ATTR int bootCount = 0;          //To count the number of boot from dee
 RTC_DATA_ATTR int successCount = 0;       //To count the number of succesful reading sent
 RTC_DATA_ATTR bool sucessFlash = false;   //To only send the success flash once per reset.
 bool firstSerial = true;                  //To enable a return before the first message of the wakeup
+float halfVoltageValue = 0.0;             //Raw read from input pin    
+#define RAW_VOLTS_CONVERTION 620.4        //Mapping raw input back to voltage  4096 / (3.3 * 2)
+float volts = 0.0;                        //Converted to voltage (doubled and mapped back from scale of 0 - 4096 for 0 - 3.3V)
 
 #define DHTPIN 22                         // DHT Pin 
 #define DHTTYPE DHT11                     // DHT type 11 
@@ -46,6 +49,7 @@ char timeStringBuff[50];
 
 #define LED_PIN  5                         //Select for board type
 //#define LED_PIN  LED_BUILTIN
+#define BATT_PIN 35                        //Batter voltage raw - will be halved by the biard
 
 
 // Create objects
@@ -75,7 +79,7 @@ void setup() {
   }
   else
   {
-    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), " %d/%m/%y %H:%M:%S", &timeinfo);
   }
   
 
@@ -93,8 +97,10 @@ void setup() {
   }
 
   successCount++;
- 
-  debug_message("Last Reading " + String(timeStringBuff) + " | Temp : " + String(t) + " | Humidity : " + String(h) + " | Boot Cycles : " + String(bootCount) + " | Succesful Readings : " + String(successCount), true);
+  halfVoltageValue = analogRead(BATT_PIN);
+  volts = halfVoltageValue / RAW_VOLTS_CONVERTION;
+    
+  debug_message(String(timeStringBuff) + " | T: " + String(t,1) + " | H: " + String(h,0) + " | Bat: " + String(volts,2) +"V" + " | Boot: " + String(bootCount) + " | Success: " + String(successCount), true);
   client.publish(temperature_topic, String(t).c_str(), false);   // Publish temperature
   delay(100); //some delay is needed for the mqtt server to accept the message
   client.publish(humidity_topic, String(h).c_str(), false);      // Publish humidity
@@ -192,21 +198,6 @@ void deep_sleep (int sleepSeconds) {
   debug_message("Setup ESP32 to sleep for " + String(sleepSeconds) + " Seconds", false);
   WiFi.disconnect();
   esp_deep_sleep_start();
-}
-
-void printLocalTime()
-{
-  struct tm timeinfo;
-  char timeStringBuff[50];
-  if (!getLocalTime(&timeinfo)) {
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  // String.print(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
-  Serial.print("Second version ");
-  Serial.println(timeStringBuff);
 }
 
 void loop() {
