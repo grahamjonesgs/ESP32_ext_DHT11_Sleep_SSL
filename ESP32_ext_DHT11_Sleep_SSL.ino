@@ -97,7 +97,7 @@ void setup() {
   }
   else
   {
-    strftime(timeStringBuff, sizeof(timeStringBuff), " %d/%m/%y %H:%M:%S", &timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%d/%m/%y %H:%M:%S", &timeinfo);
   }
 
 
