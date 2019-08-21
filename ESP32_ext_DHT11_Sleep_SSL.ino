@@ -14,26 +14,21 @@
 
 
 /* Configuration Section */
-// #define temperature_topic "gBridge/u1935/kitchen/tempset-ambient/set"         //Topic temperature
-// #define humidity_topic "gBridge/u1935/kitchen/tempset-humidity/set"         //Topic humidity
-// #define debug_topic "gBridge/u1935/kitchen/debug"                           //Debug topic
 #define ROOM "kitchen"                      // Room for topic
-#define DHTPIN 22                         // DHT Data Pin 
-#define DHTTYPE DHT11                     // DHT type 11
-//#define LED_PIN  5                        // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
+#define DHTPIN 22                          // DHT Data Pin 
+#define DHTTYPE DHT11                      // DHT type 11
+//#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
 #define LED_PIN  LED_BUILTIN
-#define BATT_PIN 0                       // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
+#define BATT_PIN 0                        // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
 
-bool debug_serial = true;                 // Display log message if True to serial
+bool debug_serial = true;                 // Display log message if true to serial
 bool debug_mqtt = true;                   // Log to mqtt debug topic if true
 
 #define MQTT_TOPIC_USER "gBridge/u1935/"           //MQTT topic prefic
 #define MQTT_TEMP_TOPIC  "/tempset-ambient/set"
 #define MQTT_HUMID_TOPIC  "/tempset-humidity/set"
 #define MQTT_DEBUG_TOPIC "/debug"
-
 /* End configuration Section */
-
 
 // definitions for deepsleep
 #define uS_TO_S_FACTOR 1000000LL          // Conversion factor for micro seconds to seconds (LL to force long maths to avoid overflow)
@@ -46,15 +41,21 @@ bool debug_mqtt = true;                   // Log to mqtt debug topic if true
 #define FIRST_WIFI 5                      // Number of boot count of first wifi, with the shorter sleep time 
 #define MQTT_RETRIES 2                    // Number of times to retry the mqtt before a restart
 
+//Variable to persist deep sleep
 RTC_DATA_ATTR int bootCount = 0;          // To count the number of boot from deep sleep
 RTC_DATA_ATTR int successCount = 0;       // To count the number of succesful reading sent
 RTC_DATA_ATTR bool sucessFlash = false;   // To only send the success flash once per reset.
+
+//Global variables
 bool firstSerial = true;                  // To enable a return before the first message of the wakeup
 float halfVoltageValue = 0.0;             // Raw read from input pin
 #define RAW_VOLTS_CONVERTION 620.5        // Mapping raw input back to voltage  4096 / (3.3 * 2)
 float volts = 0.0;                        // Converted to voltage (doubled and mapped back from scale of 0 - 4096 for 0 - 3.3V)
 RTC_DATA_ATTR float initialVolts = 0.0;   // To count the number of boot from deep sleep
-String batteryMessage;                    // Message for debug mesage on battery status
+String batteryMessage;                    
+String temperature_topic;
+String humidity_topic;
+String debug_topic;
 
 
 //Definitions for NPT time
@@ -68,10 +69,6 @@ char timeStringBuff[50];
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
-
-String temperature_topic;
-String humidity_topic;
-String debug_topic;
 
 void setup() {
   //Set up topics
@@ -194,7 +191,7 @@ void debug_message(String message, bool perm) {
     client.publish(debug_topic.c_str(), message.c_str(), perm);  //publish non retained mqtt message
   }
   if (debug_serial) {
-    if (firstSerial && bootCount != 1) {                  //New line of first message of wake up as there is junk in the buffer, not need on hard reset
+    if (firstSerial) {                                     //New line of first message of wake up as there is junk in the buffer
       Serial.println("");
       firstSerial = false;
     }
