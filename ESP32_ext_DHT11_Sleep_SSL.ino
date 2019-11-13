@@ -14,9 +14,10 @@
 
 
 /* Configuration Section */
-#define ROOM "kitchen"                      // Room for topic
+#define ROOM "bathroom"                      // Room for topic
 #define DHTPIN 22                          // DHT Data Pin 
 #define DHTTYPE DHT11                      // DHT type 11
+//#define DHTTYPE DHT22                      // DHT type 22
 //#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
 #define LED_PIN  LED_BUILTIN
 #define BATT_PIN 0                        // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
@@ -77,7 +78,7 @@ void setup() {
   debug_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_DEBUG_TOPIC);            // Topic Debug
 
   if (debug_serial) {
-    Serial.begin(9600);
+    Serial.begin(115200);
   }
   bootCount++;
   //Set up built in LED as message light
