@@ -18,13 +18,13 @@
 
 
 /* Configuration Section */
-#define ROOM "test"                      // Room for topic
+#define ROOM "bedroom"                      // Room for topic
 #define DHTPIN 22                          // DHT Data Pin 
-#define DHTTYPE DHT11                      // DHT type 11
-//#define DHTTYPE DHT22                      // DHT type 22
+//define DHTTYPE DHT11                      // DHT type 11
+#define DHTTYPE DHT22                      // DHT type 22
 //#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
 #define LED_PIN  LED_BUILTIN
-#define BATT_PIN 0                        // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
+#define BATT_PIN 0                         // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
 
 bool debug_serial = true;                 // Display log message if true to serial
 bool debug_mqtt = true;                   // Log to mqtt debug topic if true
@@ -37,10 +37,10 @@ bool debug_mqtt = true;                   // Log to mqtt debug topic if true
 
 // definitions for deepsleep
 #define uS_TO_S_FACTOR 1000000LL          // Conversion factor for micro seconds to seconds (LL to force long maths to avoid overflow)
-#define TIME_TO_SLEEP 300                 // Time to sleep normally for success 
-#define TIME_TO_SLEEP_DHT_ERROR 3600      // Time to sleep in case of DHT error (hardware error)  
-#define TIME_TO_SLEEP_MQTT_ERROR 1800     // Time to sleep in case of MQTT connection error
-#define TIME_TO_SLEEP_WIFI_ERROR 600      // Time to sleep in case of WiFI error
+#define TIME_TO_SLEEP 30                 // Time to sleep normally for success 
+#define TIME_TO_SLEEP_DHT_ERROR 30      // Time to sleep in case of DHT error (hardware error)  
+#define TIME_TO_SLEEP_MQTT_ERROR 30     // Time to sleep in case of MQTT connection error
+#define TIME_TO_SLEEP_WIFI_ERROR 30      // Time to sleep in case of WiFI error
 #define TIME_TO_SLEEP_FIRST_WIFI_ERROR 5  // Time to sleep in case of initial WiFI error - sometime does not connect at first
 #define WIFI_RETRIES 5                    // Number of times to retry the wifi before a restart
 #define FIRST_WIFI 5                      // Number of boot count of first wifi, with the shorter sleep time 
@@ -107,6 +107,7 @@ void setup() {
 
 
   dht.begin();
+  delay(2000);
   float t = dht.readTemperature();
   float h = dht.readHumidity();
   if ( isnan(t) || isnan(h)) {
