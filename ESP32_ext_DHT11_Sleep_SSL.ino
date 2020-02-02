@@ -1,8 +1,12 @@
 /* Project ESP32, DHT, MQTT and Deepsleep
 
-  For new rooms checks DHT type, topics and board type
+  For new rooms check DHT type, topics and board type
 
   Check any debug chnages to sleep time
+  Need library
+  - PubSubCleint
+  - DHT Sensor Library
+  
 
 */
 #include <WiFi.h>
@@ -14,7 +18,7 @@
 
 
 /* Configuration Section */
-#define ROOM "bathroom"                      // Room for topic
+#define ROOM "test"                      // Room for topic
 #define DHTPIN 22                          // DHT Data Pin 
 #define DHTTYPE DHT11                      // DHT type 11
 //#define DHTTYPE DHT22                      // DHT type 22
@@ -87,7 +91,7 @@ void setup() {
   setup_wifi();                           //Connect to Wifi network
 
 
-  client.setServer(mqtt_server, 8883);
+  client.setServer(MQTT_SERVER, 8883);
   if (!client.connected()) {
     reconnect();
   }
@@ -143,8 +147,8 @@ void setup() {
 void setup_wifi() {
   int counter = 1;
   delay(20);
-  debug_message("Connecting to " + String(wifi_ssid), false);
-  WiFi.begin(wifi_ssid, wifi_password);
+  debug_message("Connecting to " + String(WIFI_SSID), false);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
     counter++;
@@ -172,7 +176,7 @@ void reconnect() {
   int counter = 1;
   while (!client.connected()) {
     debug_message("Connecting to MQTT broker ...", false);
-    if (client.connect("ESP32Client", mqtt_user, mqtt_password)) {
+    if (client.connect("ESP32Client", MQTT_USER, MQTT_PASSWORD)) {
       debug_message("MQTT link OK", false);
     } else {
       debug_message("[Error] MQTT not connected: " + String(client.state()), false );
