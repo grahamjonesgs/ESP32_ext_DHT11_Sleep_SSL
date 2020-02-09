@@ -18,18 +18,18 @@
 
 
 /* Configuration Section */
-#define ROOM "bedroom"                      // Room for topic
+#define ROOM "livingroon"                      // Room for topic
 #define DHTPIN 22                          // DHT Data Pin 
 //define DHTTYPE DHT11                      // DHT type 11
 #define DHTTYPE DHT22                      // DHT type 22
-//#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
-#define LED_PIN  LED_BUILTIN
-#define BATT_PIN 0                         // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
+#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
+//#define LED_PIN  LED_BUILTIN
+#define BATT_PIN 35                         // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
 
 bool debug_serial = true;                 // Display log message if true to serial
 bool debug_mqtt = true;                   // Log to mqtt debug topic if true
 
-#define MQTT_TOPIC_USER "gBridge/u1935/"           //MQTT topic prefic
+
 #define MQTT_TEMP_TOPIC  "/tempset-ambient/set"
 #define MQTT_HUMID_TOPIC  "/tempset-humidity/set"
 #define MQTT_DEBUG_TOPIC "/debug"
