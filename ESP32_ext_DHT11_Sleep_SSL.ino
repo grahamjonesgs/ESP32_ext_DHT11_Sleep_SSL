@@ -6,7 +6,7 @@
   Need library
   - PubSubCleint
   - DHT Sensor Library
-  
+
 
 */
 #include <WiFi.h>
@@ -43,6 +43,7 @@ bool debug_mqtt = true;                   // Log to mqtt debug topic if true
 #define MQTT_TEMP_TOPIC  "/tempset-ambient/set"
 #define MQTT_HUMID_TOPIC  "/tempset-humidity/set"
 #define MQTT_DEBUG_TOPIC "/debug"
+#define MQTT_BATTERY_TOPIC "/battery/set"
 /* End configuration Section */
 
 // definitions for deepsleep
@@ -63,10 +64,11 @@ float halfVoltageValue = 0.0;             // Raw read from input pin
 #define RAW_VOLTS_CONVERTION 620.5        // Mapping raw input back to voltage  4096 / (3.3 * 2)
 float volts = 0.0;                        // Converted to voltage (doubled and mapped back from scale of 0 - 4096 for 0 - 3.3V)
 RTC_DATA_ATTR float initialVolts = 0.0;   // To count the number of boot from deep sleep
-String batteryMessage;                    
+String batteryMessage;
 String temperature_topic;
 String humidity_topic;
 String debug_topic;
+String battery_topic;
 
 
 //Definitions for NPT time
@@ -86,6 +88,7 @@ void setup() {
   temperature_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_TEMP_TOPIC);       // Topic temperature
   humidity_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_HUMID_TOPIC);         // Topic humidity
   debug_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_DEBUG_TOPIC);            // Topic Debug
+  battery_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_BATTERY_TOPIC);            // Topic Debug
 
   if (debug_serial) {
     Serial.begin(115200);
@@ -133,7 +136,9 @@ void setup() {
     if (volts > initialVolts) {
       initialVolts = volts;
     }
+    Serial.println("xxxx sending battery status");
     batteryMessage = " | Bat: " + String(volts, 2) + "V/" + String(initialVolts, 2) + "V";
+    client.publish(battery_topic.c_str(), String(volts,2).c_str(), false);   // Publish current voltage
   }
   else
   {
