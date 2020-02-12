@@ -52,6 +52,8 @@ bool debug_mqtt = true;                   // Log to mqtt debug topic if true
 #define WIFI_RETRIES 5                    // Number of times to retry the wifi before a restart
 #define FIRST_WIFI 5                      // Number of boot count of first wifi, with the shorter sleep time 
 #define MQTT_RETRIES 2                    // Number of times to retry the mqtt before a restart
+#define VOLT_READS 10                     // Number of time to read the voltage
+
 
 //Variable to persist deep sleep
 RTC_DATA_ATTR int bootCount = 0;          // To count the number of boot from deep sleep
@@ -61,6 +63,8 @@ RTC_DATA_ATTR bool sucessFlash = false;   // To only send the success flash once
 //Global variables
 bool firstSerial = true;                  // To enable a return before the first message of the wakeup
 float halfVoltageValue = 0.0;             // Raw read from input pin
+float totalHalfVoltageValue = 0.0;             // For calculaing average value
+float tempHalfVoltageValue = 0.0;             // For calculaing average value
 #define RAW_VOLTS_CONVERTION 620.5        // Mapping raw input back to voltage  4096 / (3.3 * 2)
 float volts = 0.0;                        // Converted to voltage (doubled and mapped back from scale of 0 - 4096 for 0 - 3.3V)
 RTC_DATA_ATTR float initialVolts = 0.0;   // To count the number of boot from deep sleep
@@ -85,14 +89,32 @@ PubSubClient client(espClient);
 
 void setup() {
   //Set up topics
+
+
+
+  if (BATT_PIN) {
+    for (int i = 0; i < VOLT_READS; i++) {
+      tempHalfVoltageValue = analogRead(BATT_PIN);
+      totalHalfVoltageValue = totalHalfVoltageValue + tempHalfVoltageValue;
+      delay(50);
+    }
+    halfVoltageValue = totalHalfVoltageValue / VOLT_READS;
+    volts = halfVoltageValue / RAW_VOLTS_CONVERTION;
+    if (volts > initialVolts) {
+      initialVolts = volts;
+    }
+  }
+
+  if (debug_serial) {
+    Serial.begin(115200);
+  }
+
   temperature_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_TEMP_TOPIC);       // Topic temperature
   humidity_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_HUMID_TOPIC);         // Topic humidity
   debug_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_DEBUG_TOPIC);            // Topic Debug
   battery_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_BATTERY_TOPIC);            // Topic Debug
 
-  if (debug_serial) {
-    Serial.begin(115200);
-  }
+
   bootCount++;
   //Set up built in LED as message light
   pinMode(LED_PIN, OUTPUT);
@@ -130,15 +152,11 @@ void setup() {
   }
 
   successCount++;
+
   if (BATT_PIN) {
-    halfVoltageValue = analogRead(BATT_PIN);
-    volts = halfVoltageValue / RAW_VOLTS_CONVERTION;
-    if (volts > initialVolts) {
-      initialVolts = volts;
-    }
     Serial.println("xxxx sending battery status");
     batteryMessage = " | Bat: " + String(volts, 2) + "V/" + String(initialVolts, 2) + "V";
-    client.publish(battery_topic.c_str(), String(volts,2).c_str(), false);   // Publish current voltage
+    client.publish(battery_topic.c_str(), String(volts, 2).c_str(), false);  // Publish current voltage
   }
   else
   {
