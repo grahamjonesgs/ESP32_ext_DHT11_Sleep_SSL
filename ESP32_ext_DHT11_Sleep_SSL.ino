@@ -35,10 +35,8 @@
 #define TIME_TO_SLEEP 30                 // Time to sleep normally for success
 #endif
 
-
 bool debug_serial = true;                 // Display log message if true to serial
 bool debug_mqtt = true;                   // Log to mqtt debug topic if true
-
 
 #define MQTT_TEMP_TOPIC  "/tempset-ambient/set"
 #define MQTT_HUMID_TOPIC  "/tempset-humidity/set"
@@ -90,8 +88,6 @@ PubSubClient client(espClient);
 void setup() {
   //Set up topics
 
-
-
   if (BATT_PIN) {
     for (int i = 0; i < VOLT_READS; i++) {
       tempHalfVoltageValue = analogRead(BATT_PIN);
@@ -114,13 +110,11 @@ void setup() {
   debug_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_DEBUG_TOPIC);            // Topic Debug
   battery_topic = String(MQTT_TOPIC_USER) + String(ROOM) + String(MQTT_BATTERY_TOPIC);            // Topic Debug
 
-
   bootCount++;
   //Set up built in LED as message light
   pinMode(LED_PIN, OUTPUT);
 
   setup_wifi();                           //Connect to Wifi network
-
 
   client.setServer(MQTT_SERVER, 8883);
   if (!client.connected()) {
