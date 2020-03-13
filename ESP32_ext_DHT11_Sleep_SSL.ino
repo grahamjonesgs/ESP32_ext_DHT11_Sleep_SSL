@@ -16,11 +16,9 @@
 #include "ESP32_config.h"
 #include "DHT.h"
 
-#define TOGO_BOARD 1
-
 /* Configuration Section */
-#define ROOM "livingroom"                      // Room for topic
-#define TOGO_BOARD 1                       // Comment out if not TOGO board with battery
+#define ROOM "bedroom"                      // Room for topic
+//#define TOGO_BOARD 1                       // Comment out if not TOGO board with battery
 
 #define DHTPIN 22                          // DHT Data Pin 
 #define DHTTYPE DHT22                      // DHT type 22
