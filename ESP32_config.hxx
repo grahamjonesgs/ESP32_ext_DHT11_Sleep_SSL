@@ -1,7 +1,7 @@
-// Upate with WiFI and MQTT definitions
-#define wifi_ssid "xxxx"         
-#define wifi_password "xxxx"
+// Upate with WiFI and MQTT definitions, save as .h file
+#define WIFI_SSID "xxxx"         
+#define WIFI_PASSWORD "xxxx"
 
-#define mqtt_server "xxxx"    // server name or IP
-#define mqtt_user "xxxx"      // username
-#define mqtt_password "xxxx"  // password
+#define MQTT_SERVER "xxxx"    // server name or IP
+#define MQTT_USER "xxxx"      // username
+#define MQTT_PASSWORD "xxxx"  // password
