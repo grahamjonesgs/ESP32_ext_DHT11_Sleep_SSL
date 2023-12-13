@@ -4,7 +4,7 @@
 
   Check any debug chnages to sleep time
   Need library
-  - PubSubCleint
+  - PubSubClient
   - DHT Sensor Library
 
 
@@ -17,11 +17,11 @@
 #include "DHT.h"
 
 /* Configuration Section */
-#define ROOM "bedroom"                      // Room for topic
+#define ROOM "kitchen"                      // Room for topic
 //#define TOGO_BOARD 1                       // Comment out if not TOGO board with battery
 
-#define DHTPIN 22                          // DHT Data Pin 
-#define DHTTYPE DHT22                      // DHT type 22
+#define DHTPIN 23                          // DHT Data Pin 
+#define DHTTYPE DHT22                      // DHT type 11
 
 #ifdef TOGO_BOARD
 #define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
@@ -80,7 +80,8 @@ char timeStringBuff[50];
 
 // Create objects
 DHT dht(DHTPIN, DHTTYPE);
-WiFiClientSecure espClient;
+//WiFiClientSecure espClient;
+WiFiClient espClient;
 PubSubClient client(espClient);
 
 void setup() {
@@ -114,7 +115,7 @@ void setup() {
 
   setup_wifi();                           //Connect to Wifi network
 
-  client.setServer(MQTT_SERVER, 8883);
+  client.setServer(MQTT_SERVER, 1883);
   if (!client.connected()) {
     reconnect();
   }
@@ -162,6 +163,7 @@ void setup() {
     flash_led(true);
     sucessFlash = true; //only do this once per external reset
   }
+  WiFi.disconnect();
   deep_sleep(TIME_TO_SLEEP);
 }
 
