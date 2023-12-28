@@ -17,18 +17,18 @@
 #include "DHT.h"
 
 /* Configuration Section */
-#define ROOM "kitchen"                      // Room for topic
+#define ROOM "cave"                      // Room for topic
 //#define TOGO_BOARD 1                       // Comment out if not TOGO board with battery
 
 #define DHTPIN 23                          // DHT Data Pin 
 #define DHTTYPE DHT22                      // DHT type 11
 
 #ifdef TOGO_BOARD
-#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards
+#define LED_PIN  5                       // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards, 0 for no flash
 #define BATT_PIN 35                         // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
 #define TIME_TO_SLEEP 300                 // Time to sleep normally for success
 #else
-#define LED_PIN  LED_BUILTIN
+#define LED_PIN  0            // The builtin LED - hardcode 5 for TTGO board, make LED_BUILTIN for other boards, 0 for no flash
 #define BATT_PIN 0                         // Battery measurement PIN - built in on 35 on TTGO board, set to zero for no battery
 #define TIME_TO_SLEEP 30                 // Time to sleep normally for success
 #endif
@@ -172,11 +172,13 @@ void setup_wifi() {
   int counter = 1;
   delay(20);
   debug_message("Connecting to " + String(WIFI_SSID), false);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
     counter++;
-    delay(1000);
+    WiFi.disconnect();
+    WiFi.mode(WIFI_STA);
+    WiFi.enableSTA(true);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     debug_message("Trying WiFI", false);
 
     if (counter > WIFI_RETRIES) {
@@ -189,6 +191,7 @@ void setup_wifi() {
         deep_sleep(TIME_TO_SLEEP);
       }
     }
+    delay(3000);
   }
 
   debug_message("WiFi is OK => ESP32 new IP address is: " + WiFi.localIP().toString(), false);
