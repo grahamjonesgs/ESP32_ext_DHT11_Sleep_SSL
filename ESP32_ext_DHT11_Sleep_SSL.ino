@@ -73,7 +73,7 @@ String battery_topic;
 
 //Definitions for NPT time
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 3600;
+const long  gmtOffset_sec = 7200;
 const int   daylightOffset_sec = 3600;
 struct tm timeinfo;
 char timeStringBuff[50];
@@ -163,6 +163,7 @@ void setup() {
     flash_led(true);
     sucessFlash = true; //only do this once per external reset
   }
+  delay(2000);
   WiFi.disconnect();
   deep_sleep(TIME_TO_SLEEP);
 }
@@ -220,7 +221,9 @@ void reconnect() {
 
 void debug_message(String message, bool perm) {
   if (debug_mqtt) {
+    //Serial.println("xxxxx mqtt debug message");
     client.publish(debug_topic.c_str(), message.c_str(), perm);  //publish non retained mqtt message
+    delay(100);
   }
   if (debug_serial) {
     if (firstSerial) {                                     //New line of first message of wake up as there is junk in the buffer
